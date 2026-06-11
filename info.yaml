@@ -1,56 +1,89 @@
-# Tiny Tapeout project information
-project:
-  title:        ""      # Project title
-  author:       ""      # Your name
-  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+# TinyTapeout Grid Processor - Oracle Super-Turing Architecture
+# config.yaml for SkyWater 130nm technology node
 
-  # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+tt:
+  version: 7
+  project: "grid_oracle"
+  author: "Kaoru Aguilera Katayama"
+  license: "Apache-2.0"
+  description: "Grid Processor - Spatial Computing Oracle with Massively Parallel Architecture"
 
-  # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
+  inputs:
+    - name: "in_0";  description: "Grid seed bit 0 / Data bus D0"
+    - name: "in_1";  description: "Grid seed bit 1 / Data bus D1"
+    - name: "in_2";  description: "Grid seed bit 2 / Data bus D2"
+    - name: "in_3";  description: "Grid seed bit 3 / Data bus D3"
+    - name: "in_4";  description: "Grid seed bit 4 / Data bus D4"
+    - name: "in_5";  description: "Grid seed bit 5 / Data bus D5"
+    - name: "in_6";  description: "Grid seed bit 6 / Data bus D6"
+    - name: "in_7";  description: "Grid seed bit 7 / Data bus D7"
 
-  # List your project's source files here.
-  # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
-  source_files:
-    - "project.v"
+  outputs:
+    - name: "out_0"; description: "Result bit 0 / Status LSB"
+    - name: "out_1"; description: "Result bit 1"
+    - name: "out_2"; description: "Result bit 2"
+    - name: "out_3"; description: "Result bit 3"
+    - name: "out_4"; description: "Result bit 4"
+    - name: "out_5"; description: "Result bit 5"
+    - name: "out_6"; description: "Result bit 6"
+    - name: "out_7"; description: "Result bit 7 / Status MSB"
 
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-pinout:
-  # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  clock: "clk"
+  reset: "rst_n"
 
-  # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  extra_pins:
+    - name: "ui_in_0";   description: "TRIGGER - Starts grid computation"
+    - name: "ui_in_1";   description: "SELECT - Page selector for 64-bit result bank"
+    - name: "uo_out_0";  description: "IRQ - Interrupt request when result ready"
+    - name: "uo_out_1";  description: "READY - High when projection buffer converged"
 
-  # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+grid:
+  rows: 8
+  cols: 8
+  total_cells: 64
+  cell_topology: "moore"
+  cell_state_bits: 4
+  max_iterations: 256
+  convergence_threshold: 3
+  rule_type: "totalistic"
 
-# Do not change!
-yaml_version: 6
+bridge:
+  projection_buffer:
+    depth: 64
+    collapse_function: "majority_threshold"
+  handshake:
+    wait_mode: "freeze_external"
+    ready_assertion: "convergence_detected"
+    timeout_cycles: 4096
+  adc:
+    sample_rate_hz: 1000000
+    resolution_bits: 8
+    averaging_window: 16
+    thermal_filter: "exponential_moving_avg"
+    filter_alpha: 0.125
+
+timing:
+  grid_clock_divider: 4
+  projection_clock_divider: 16
+  readout_clock_divider: 64
+
+pdk:
+  name: "sky130"
+  process: "130nm"
+  voltage:
+    nominal: 1.8
+    minimum: 1.62
+    maximum: 1.98
+  corner: "tt"
+  min_width: 0.15
+  min_spacing: 0.14
+  min_enclosure: 0.08
+  via_size: 0.17
+  cell_library: "sky130_fd_sc_hd"
+
+build:
+  flow: "openlane2"
+  clock_period_ns: 50
+  clock_uncertainty_ns: 2
+  max_capacitance_pf: 0.05
+  max_fanout: 16
