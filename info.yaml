@@ -1,42 +1,54 @@
-# TinyTapeout Grid Processor - Oracle Super-Turing Architecture
-# config.yaml for SkyWater 130nm technology node
-
 tt:
   version: 7
   project: "grid_oracle"
   author: "Kaoru Aguilera Katayama"
   license: "Apache-2.0"
   description: "Grid Processor - Spatial Computing Oracle with Massively Parallel Architecture"
-
   inputs:
-    - name: "in_0";  description: "Grid seed bit 0 / Data bus D0"
-    - name: "in_1";  description: "Grid seed bit 1 / Data bus D1"
-    - name: "in_2";  description: "Grid seed bit 2 / Data bus D2"
-    - name: "in_3";  description: "Grid seed bit 3 / Data bus D3"
-    - name: "in_4";  description: "Grid seed bit 4 / Data bus D4"
-    - name: "in_5";  description: "Grid seed bit 5 / Data bus D5"
-    - name: "in_6";  description: "Grid seed bit 6 / Data bus D6"
-    - name: "in_7";  description: "Grid seed bit 7 / Data bus D7"
-
+    - name: "in_0"
+      description: "Grid seed bit 0 / Data bus D0"
+    - name: "in_1"
+      description: "Grid seed bit 1 / Data bus D1"
+    - name: "in_2"
+      description: "Grid seed bit 2 / Data bus D2"
+    - name: "in_3"
+      description: "Grid seed bit 3 / Data bus D3"
+    - name: "in_4"
+      description: "Grid seed bit 4 / Data bus D4"
+    - name: "in_5"
+      description: "Grid seed bit 5 / Data bus D5"
+    - name: "in_6"
+      description: "Grid seed bit 6 / Data bus D6"
+    - name: "in_7"
+      description: "Grid seed bit 7 / Data bus D7"
   outputs:
-    - name: "out_0"; description: "Result bit 0 / Status LSB"
-    - name: "out_1"; description: "Result bit 1"
-    - name: "out_2"; description: "Result bit 2"
-    - name: "out_3"; description: "Result bit 3"
-    - name: "out_4"; description: "Result bit 4"
-    - name: "out_5"; description: "Result bit 5"
-    - name: "out_6"; description: "Result bit 6"
-    - name: "out_7"; description: "Result bit 7 / Status MSB"
-
+    - name: "out_0"
+      description: "Result bit 0 / Status LSB"
+    - name: "out_1"
+      description: "Result bit 1"
+    - name: "out_2"
+      description: "Result bit 2"
+    - name: "out_3"
+      description: "Result bit 3"
+    - name: "out_4"
+      description: "Result bit 4"
+    - name: "out_5"
+      description: "Result bit 5"
+    - name: "out_6"
+      description: "Result bit 6"
+    - name: "out_7"
+      description: "Result bit 7 / Status MSB"
   clock: "clk"
   reset: "rst_n"
-
   extra_pins:
-    - name: "ui_in_0";   description: "TRIGGER - Starts grid computation"
-    - name: "ui_in_1";   description: "SELECT - Page selector for 64-bit result bank"
-    - name: "uo_out_0";  description: "IRQ - Interrupt request when result ready"
-    - name: "uo_out_1";  description: "READY - High when projection buffer converged"
-
+    - name: "ui_in_0"
+      description: "TRIGGER - Starts grid computation"
+    - name: "ui_in_1"
+      description: "SELECT - Page selector for 64-bit result bank"
+    - name: "uo_out_0"
+      description: "IRQ - Interrupt request when result ready"
+    - name: "uo_out_1"
+      description: "READY - High when projection buffer converged"
 grid:
   rows: 8
   cols: 8
@@ -46,7 +58,6 @@ grid:
   max_iterations: 256
   convergence_threshold: 3
   rule_type: "totalistic"
-
 bridge:
   projection_buffer:
     depth: 64
@@ -61,12 +72,10 @@ bridge:
     averaging_window: 16
     thermal_filter: "exponential_moving_avg"
     filter_alpha: 0.125
-
 timing:
   grid_clock_divider: 4
   projection_clock_divider: 16
   readout_clock_divider: 64
-
 pdk:
   name: "sky130"
   process: "130nm"
@@ -80,7 +89,6 @@ pdk:
   min_enclosure: 0.08
   via_size: 0.17
   cell_library: "sky130_fd_sc_hd"
-
 build:
   flow: "openlane2"
   clock_period_ns: 50
