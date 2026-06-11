@@ -6,36 +6,41 @@ project:
   author:       "Kaoru Aguilera Katayama"
   language:     "Verilog"
   clock_hz:     20000000
-  tiles:        "1x1"          # Ojo: En la versión 6 se pone en formato string "1x1", no como lista
+  tiles:        "1x1"
+  top_module:   "tt_um_grid_oracle"
+  source_files:
+    - "tt_um_grid_oracle.sv"
+    # Agrega aquí abajo los demás archivos .sv o .v que use tu diseño si no están metidos todos en el mismo archivo, por ejemplo:
+    # - "clock_divider.sv"
+    # - "grid_processor_core.sv"
 
 pinout:
-  inputs:
-    - "in_0 / D0"
-    - "in_1 / D1"
-    - "in_2 / D2"
-    - "in_3 / D3"
-    - "in_4 / D4"
-    - "in_5 / D5"
-    - "in_6 / D6"
-    - "in_7 / D7"
-  outputs:
-    - "out_0 / Status LSB"
-    - "out_1"
-    - "out_2"
-    - "out_3"
-    - "out_4"
-    - "out_5"
-    - "out_6"
-    - "out_7 / Status MSB"
-  bidirectional:
-    - "TRIGGER (uio_in)"
-    - "SELECT (uio_in)"
-    - "IRQ (uo_out)"
-    - "READY (uo_out)"
-    - "none"
-    - "none"
-    - "none"
-    - "none"
+  ui[0]: "Grid seed bit 0 / Data bus D0"
+  ui[1]: "Grid seed bit 1 / Data bus D1"
+  ui[2]: "Grid seed bit 2 / Data bus D2"
+  ui[3]: "Grid seed bit 3 / Data bus D3"
+  ui[4]: "Grid seed bit 4 / Data bus D4"
+  ui[5]: "Grid seed bit 5 / Data bus D5"
+  ui[6]: "Grid seed bit 6 / Data bus D6"
+  ui[7]: "Grid seed bit 7 / Data bus D7"
+
+  uo[0]: "Result bit 0 / Status LSB"
+  uo[1]: "Result bit 1"
+  uo[2]: "Result bit 2"
+  uo[3]: "Result bit 3"
+  uo[4]: "Result bit 4"
+  uo[5]: "Result bit 5"
+  uo[6]: "Result bit 6"
+  uo[7]: "Result bit 7 / Status MSB"
+
+  uio[0]: "TRIGGER (uio_in)"
+  uio[1]: "SELECT (uio_in)"
+  uio[2]: "IRQ (uo_out)"
+  uio[3]: "READY (uo_out)"
+  uio[4]: "none"
+  uio[5]: "none"
+  uio[6]: "none"
+  uio[7]: "none"
 
 documentation:
   how_it_works: "Spatial computing oracle with an 8x8 cellular automata grid utilizing Moore neighborhood totalistic logic for acceleration."
