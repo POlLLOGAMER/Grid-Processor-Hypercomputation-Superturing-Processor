@@ -1,30 +1,38 @@
 // =============================================================================
 // Grid Processor - Top Level Entity
-// TinyTapeout 7 Standard Interface
+// TinyTapeout 7 Standard Interface  (FIXED)
 // SkyWater 130nm Technology
+//
+// Pin mapping:
+//   ui_in[7:0]  -> Grid seed bits [7:0]
+//   uo_out[7:0] -> Result page (LSB page or convergence page)
+//   uio_in[0]   -> TRIGGER  (starts computation)
+//   uio_in[1]   -> SELECT   (0=result_lsb, 1=convergence page)
+//   uio_out[0]  -> IRQ      (pulse when result ready)
+//   uio_out[1]  -> READY    (high when converged)
+//   uio_oe      -> 8'b00000011 (uio[0] y uio[1] como salidas)
+//   clk         -> system clock (TT standard)
+//   rst_n       -> active-low reset (TT standard)
+//   ena         -> design enable (TT standard, unused internally)
 // =============================================================================
 
 `default_nettype none
 `timescale 1ns / 1ps
 
 module tt_um_grid_oracle (
-    input  wire        ui_clk,
-    input  wire        ui_rstb,
-    input  wire [7:0]  ui_in,
-    output wire [7:0]  uo_out,
-    input  wire        uio_in,
-    output wire        uio_oe,
-    output wire        uio_out,
-    input  wire        sclk,
-    input  wire        srstb,
-    input  wire [7:0]  sf_rdata,
-    output wire [7:0]  sf_wdata,
-    output wire        sf_wr_en,
-    input  wire        sf_rd_en
+    input  wire [7:0] ui_in,    // Dedicated inputs  : grid seed [7:0]
+    output wire [7:0] uo_out,   // Dedicated outputs : result page [7:0]
+    input  wire [7:0] uio_in,   // Bidirectional in  : [0]=TRIGGER [1]=SELECT
+    output wire [7:0] uio_out,  // Bidirectional out : [0]=IRQ     [1]=READY
+    output wire [7:0] uio_oe,   // Bidirectional OE  : 1=output 0=input
+    input  wire       ena,      // Always 1 when powered (TT standard)
+    input  wire       clk,      // System clock
+    input  wire       rst_n     // Active-low reset
 );
 
-    wire        clk;
-    wire        rst_n;
+    // =========================================================================
+    // Internal signals
+    // =========================================================================
     wire        trigger;
     wire        select_page;
     wire        irq_out;
@@ -40,20 +48,55 @@ module tt_um_grid_oracle (
     wire        grid_clk;
     wire        projection_clk;
     wire        readout_clk;
+    wire        rst_n_sync;
 
+    // =========================================================================
+    // UIO pin assignment
+    // uio_oe: bit=1 means output, bit=0 means input
+    // [0]=IRQ (output), [1]=READY (output), [7:2]=inputs
+    // =========================================================================
+    assign uio_oe  = 8'b00000011;
+    assign uio_out = {6'b000000, ready_out, irq_out};
+
+    assign trigger     = uio_in[0];
+    assign select_page = uio_in[1];
+
+    // =========================================================================
+    // Reset synchronizer
+    // =========================================================================
+    reset_synchronizer u_rst_sync (
+        .async_rst (~rst_n),
+        .clk       (clk),
+        .rst_n     (rst_n_sync)
+    );
+
+    // =========================================================================
     // Clock dividers
-    clock_divider #(4) u_grid_clk_div (.clk_in(ui_clk), .rst_n(rst_n), .clk_out(grid_clk));
-    clock_divider #(16) u_proj_clk_div (.clk_in(ui_clk), .rst_n(rst_n), .clk_out(projection_clk));
-    clock_divider #(64) u_read_clk_div (.clk_in(ui_clk), .rst_n(rst_n), .clk_out(readout_clk));
+    // =========================================================================
+    clock_divider #(.DIVIDER(4))  u_grid_clk_div (
+        .clk_in  (clk),
+        .rst_n   (rst_n_sync),
+        .clk_out (grid_clk)
+    );
 
-    reset_synchronizer u_rst_sync (.async_rst(~ui_rstb), .clk(ui_clk), .rst_n(rst_n));
+    clock_divider #(.DIVIDER(16)) u_proj_clk_div (
+        .clk_in  (clk),
+        .rst_n   (rst_n_sync),
+        .clk_out (projection_clk)
+    );
 
-    assign trigger     = uio_in & (~select_page);
-    assign select_page = uio_in & select_page;
+    clock_divider #(.DIVIDER(64)) u_read_clk_div (
+        .clk_in  (clk),
+        .rst_n   (rst_n_sync),
+        .clk_out (readout_clk)
+    );
 
+    // =========================================================================
+    // Grid processor core (8x8 cellular automaton)
+    // =========================================================================
     grid_processor_core u_grid_core (
         .clk            (grid_clk),
-        .rst_n          (rst_n),
+        .rst_n          (rst_n_sync),
         .trigger        (trigger),
         .seed_data      (ui_in),
         .projection_clk (projection_clk),
@@ -65,62 +108,53 @@ module tt_um_grid_oracle (
         .convergence    (grid_convergence_flag)
     );
 
+    // =========================================================================
+    // Bridge quantizer (WAIT/READY handshake FSM)
+    // =========================================================================
     bridge_quantizer u_bridge (
-        .clk                (grid_clk),
-        .rst_n              (rst_n),
-        .trigger            (trigger),
-        .grid_stable        (grid_stable),
-        .grid_overflow      (grid_overflow),
-        .convergence        (grid_convergence_flag),
-        .projection_buffer  (projection_buffer),
-        .iteration_counter  (iteration_counter),
-        .ready              (ready_out),
-        .irq                (irq_out)
+        .clk               (grid_clk),
+        .rst_n             (rst_n_sync),
+        .trigger           (trigger),
+        .grid_stable       (grid_stable),
+        .grid_overflow     (grid_overflow),
+        .convergence       (grid_convergence_flag),
+        .projection_buffer (projection_buffer),
+        .iteration_counter (iteration_counter),
+        .ready             (ready_out),
+        .irq               (irq_out)
     );
 
-    adc_interface u_adc (
-        .clk            (projection_clk),
-        .rst_n          (rst_n),
-        .analog_input   (projection_buffer[7:0]),
-        .sample_enable  (ready_out),
-        .digital_out    (result_lsb)
+    // =========================================================================
+    // ADC interfaces (EMA filter sobre projection buffer)
+    // =========================================================================
+    adc_interface u_adc_lsb (
+        .clk           (projection_clk),
+        .rst_n         (rst_n_sync),
+        .analog_input  (projection_buffer[7:0]),
+        .sample_enable (ready_out),
+        .digital_out   (result_lsb)
     );
 
     adc_interface u_adc_msb (
-        .clk            (projection_clk),
-        .rst_n          (rst_n),
-        .analog_input   (projection_buffer[63:56]),
-        .sample_enable  (ready_out),
-        .digital_out    (result_msb)
+        .clk           (projection_clk),
+        .rst_n         (rst_n_sync),
+        .analog_input  (projection_buffer[63:56]),
+        .sample_enable (ready_out),
+        .digital_out   (result_msb)
     );
 
+    // =========================================================================
+    // Output mux - page selector
+    // SELECT=0 -> result_lsb (projection buffer EMA [7:0])
+    // SELECT=1 -> convergence flags en bits [7:4]
+    // =========================================================================
     output_mux u_out_mux (
-        .select_page    (select_page),
-        .result_lsb     (result_lsb),
-        .result_msb     (result_msb),
-        .grid_state     (grid_state[31:24]),
-        .convergence    (grid_convergence_flag[3:0]),
-        .output_data    (uo_out)
+        .select_page  (select_page),
+        .result_lsb   (result_lsb),
+        .result_msb   (result_msb),
+        .grid_state   (grid_state[31:24]),
+        .convergence  (grid_convergence_flag),
+        .output_data  (uo_out)
     );
-
-    assign uio_out = irq_out | (ready_out << 1);
-    assign uio_oe  = 1'b1;
-
-    sfr_interface u_sfr (
-        .clk         (readout_clk),
-        .rst_n       (rst_n),
-        .sclk        (sclk),
-        .srstb       (srstb),
-        .rd_en       (sf_rd_en),
-        .wr_en       (sf_wr_en),
-        .projection  (projection_buffer),
-        .grid_state  (grid_state),
-        .convergence (grid_convergence_flag),
-        .iterations  (iteration_counter),
-        .status      ({irq_out, ready_out, grid_stable, grid_overflow}),
-        .sf_wdata    (sf_wdata)
-    );
-
-    assign sf_rdata = 8'h00;
 
 endmodule
