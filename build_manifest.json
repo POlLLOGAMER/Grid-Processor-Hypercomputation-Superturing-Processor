@@ -1,0 +1,71 @@
+{
+  "project": "grid_oracle",
+  "version": "1.0.0",
+  "technology": "sky130",
+  "tt_version": 7,
+  "build_steps": [
+    {
+      "step": 1,
+      "name": "lint",
+      "tool": "verilator",
+      "command": "verilator --lint-only -Wall src/*.sv --top-module tt_um_grid_oracle",
+      "description": "Step 1"
+    },
+    {
+      "step": 2,
+      "name": "simulate",
+      "tool": "verilator",
+      "command": "verilator --cc src/*.sv --exe src/tb_grid_oracle.sv && make -j$(nproc)",
+      "description": "Step 2"
+    },
+    {
+      "step": 3,
+      "name": "synthesis",
+      "tool": "yosys",
+      "command": "yosys -c openlane/synth.tcl",
+      "description": "Step 3"
+    },
+    {
+      "step": 4,
+      "name": "place_route",
+      "tool": "openlane2",
+      "command": "openlane --config openlane/config.json",
+      "description": "Step 4"
+    },
+    {
+      "step": 5,
+      "name": "gds",
+      "tool": "klayout",
+      "command": "bash scripts/generate_gds.sh",
+      "description": "Step 5"
+    },
+    {
+      "step": 6,
+      "name": "drc",
+      "tool": "magic",
+      "command": "magic -dnull -noconsole -rcfile sky130A/libs.tech/magic/sky130A.magicrc gds/drc.tcl",
+      "description": "Step 6"
+    },
+    {
+      "step": 7,
+      "name": "lvs",
+      "tool": "netgen",
+      "command": "netgen -batch lvs gds/final.gds gds/netlist.spice",
+      "description": "Step 7"
+    },
+    {
+      "step": 8,
+      "name": "firmware",
+      "tool": "pico-sdk",
+      "command": "cd firmware && mkdir -p build && cd build && cmake .. && make",
+      "description": "Step 8"
+    },
+    {
+      "step": 9,
+      "name": "submit",
+      "tool": "tt-tool",
+      "command": "tt submit --project grid_oracle --gds gds/tt_um_grid_oracle_filled.gds",
+      "description": "Step 9"
+    }
+  ]
+}

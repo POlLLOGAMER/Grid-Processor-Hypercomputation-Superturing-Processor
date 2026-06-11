@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "version": 2,
+    "flow": "OpenLane 2"
+  },
+  "design_name": "tt_um_grid_oracle",
+  "top_module": "tt_um_grid_oracle",
+  "pdk": "sky130A",
+  "scl": "sky130_fd_sc_hd",
+  "clock_nets": [
+    "ui_clk"
+  ],
+  "clock_period": 50,
+  "clock_uncertainty": 2,
+  "max_fanout_const": 16,
+  "max_capacitance_const": 0.05,
+  "max_transition_const": 1.5,
+  "yosys_synth_options": "-flatten",
+  "die_area": "0 0 160 200",
+  "core_area": "5 5 155 195",
+  "fp_core_utilization": 40,
+  "fp_core_aspect_ratio": 0.8,
+  "route_max_layer": "met5",
+  "route_min_layer": "met1",
+  "diode_insertion": true,
+  "vdd_pins": [
+    "vccd1",
+    "vccd2"
+  ],
+  "gnd_pins": [
+    "vssd1",
+    "vssd2"
+  ],
+  "pwr_net": "vccd1",
+  "gnd_net": "vssd1",
+  "max_drc_iterations": 10,
+  "drc_exhaustive": true,
+  "gds_allow_empty": true,
+  "tt_include_wrapper": true,
+  "tt_user_id": "0x00000001",
+  "tt_project_name": "grid_oracle",
+  "tt_clock_period": 50
+}

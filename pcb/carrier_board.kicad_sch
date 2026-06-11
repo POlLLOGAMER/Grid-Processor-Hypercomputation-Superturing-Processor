@@ -1,0 +1,247 @@
+; =============================================================================
+; Grid Processor Carrier Board — KiCad Schematic Reference
+; QFN-48 Carrier with RP2040, Level Shifters, OLED I2C
+; =============================================================================
+
+(kicad_sch (version 20221018) (generator "Grid Oracle Design")
+
+  (title_block
+    (title "Grid Processor Carrier Board")
+    (date "2025-01-01")
+    (rev "1.0")
+    (company "Grid Oracle Project")
+  )
+
+  (lib_symbols
+    (symbol "RP2040" (in_bom yes) (on_board yes)
+      (property "Reference" "U")
+      (property "Value" "RP2040")
+      (property "Footprint" "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm")
+    )
+    (symbol "tt_um_grid_oracle" (in_bom yes) (on_board yes)
+      (property "Reference" "U")
+      (property "Value" "tt_um_grid_oracle")
+      (property "Footprint" "Package_DFN_QFN:QFN-48_7x7mm_P0.5mm")
+    )
+    (symbol "TXB0108" (in_bom yes) (on_board yes)
+      (property "Reference" "U")
+      (property "Value" "TXB0108")
+      (property "Footprint" "Package_SO:TSSOP-16_4.4x5mm_P0.65mm")
+    )
+    (symbol "AP2112K-3.3" (in_bom yes) (on_board yes)
+      (property "Reference" "U")
+      (property "Value" "AP2112K-3.3")
+      (property "Footprint" "Package_TO_SOT_SMD:SOT-23-5")
+    )
+    (symbol "AP2112K-1.8" (in_bom yes) (on_board yes)
+      (property "Reference" "U")
+      (property "Value" "AP2112K-1.8")
+      (property "Footprint" "Package_TO_SOT_SMD:SOT-23-5")
+    )
+    (symbol "USB-C-3.1" (in_bom yes) (on_board yes)
+      (property "Reference" "J")
+      (property "Value" "USB-C_Receptacle")
+      (property "Footprint" "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12")
+    )
+    (symbol "SSD1306" (in_bom yes) (on_board yes)
+      (property "Reference" "OLED")
+      (property "Value" "SSD1306_0.96_I2C")
+      (property "Footprint" "Display:OLED_SSD1306_128x64")
+    )
+  )
+
+  (nets
+    (net 1 "GND")
+    (net 2 "VCC_5V")
+    (net 3 "VCC_3V3")
+    (net 4 "VCC_1V8")
+    (net 5 "SPI0_SCK")
+    (net 6 "SPI0_MOSI")
+    (net 7 "SPI0_MISO")
+    (net 8 "SPI0_CS")
+    (net 9 "GRID_TRIGGER")
+    (net 10 "GRID_IRQ")
+    (net 11 "GRID_READY")
+    (net 12 "GRID_SELECT")
+    (net 13 "GRID_CLK")
+    (net 14 "GRID_RST")
+    (net 15 "I2C_SDA")
+    (net 16 "I2C_SCL")
+    (net 17 "BTN_TRIGGER")
+    (net 18 "BTN_RESET")
+    (net 19 "LED_COMPUTE")
+    (net 20 "LED_READY")
+    (net 21 "LED_IRQ")
+    (net 22 "LED_ERROR")
+    (net 23 "SWDIO")
+    (net 24 "SWDCLK")
+    (net 25 "XTAL_IN")
+    (net 26 "XTAL_OUT")
+  )
+
+  (sheet "Power Distribution" (at 0 0) (size 200 100)
+    (symbol "J1" "USB-C-3.1" (at 10 10)
+      (pin 1 "VBUS" (net 2))
+      (pin 5 "GND" (net 1))
+    )
+    (symbol "U4" "AP2112K-3.3" (at 50 10)
+      (pin 1 "VIN" (net 2))
+      (pin 2 "GND" (net 1))
+      (pin 5 "VOUT" (net 3))
+    )
+    (symbol "U5" "AP2112K-1.8" (at 90 10)
+      (pin 1 "VIN" (net 3))
+      (pin 2 "GND" (net 1))
+      (pin 5 "VOUT" (net 4))
+    )
+    (symbol "C1" "100nF" (at 70 40) (pin 1 (net 3)) (pin 2 (net 1)))
+    (symbol "C2" "100nF" (at 110 40) (pin 1 (net 4)) (pin 2 (net 1)))
+  )
+
+  (sheet "RP2040 MCU" (at 0 100) (size 200 120)
+    (symbol "U1" "RP2040" (at 100 100)
+      (pin 1 "VBUS" (net 2))
+      (pin 2 "3V3_EN" (net 3))
+      (pin 3 "VDD_IO" (net 3))
+      (pin 4 "VDD" (net 3))
+      (pin 30 "GND" (net 1))
+      (pin 5 "GPIO0/SCK" (net 5))
+      (pin 7 "GPIO2/MOSI" (net 6))
+      (pin 9 "GPIO4/MISO" (net 7))
+      (pin 11 "GPIO6/CS" (net 8))
+      (pin 12 "GPIO7/TRIG" (net 9))
+      (pin 13 "GPIO8/IRQ" (net 10))
+      (pin 14 "GPIO9/RDY" (net 11))
+      (pin 15 "GPIO10/SEL" (net 12))
+      (pin 16 "GPIO11/CLK" (net 13))
+      (pin 17 "GPIO12/RST" (net 14))
+      (pin 18 "GPIO16/SDA" (net 15))
+      (pin 19 "GPIO17/SCL" (net 16))
+      (pin 20 "GPIO20" (net 17))
+      (pin 21 "GPIO21" (net 18))
+      (pin 22 "GPIO22" (net 19))
+      (pin 23 "GPIO23" (net 20))
+      (pin 24 "GPIO24" (net 21))
+      (pin 25 "GPIO25" (net 22))
+      (pin 28 "SWDIO" (net 23))
+      (pin 29 "SWCLK" (net 24))
+      (pin 26 "XIN" (net 25))
+      (pin 27 "XOUT" (net 26))
+    )
+    (symbol "Y1" "12MHz_CRYSTAL" (at 160 100)
+      (pin 1 (net 25)) (pin 2 (net 26)) (pin 3 (net 1))
+    )
+  )
+
+  (sheet "Level Shifter" (at 0 220) (size 200 80)
+    (symbol "U3" "TXB0108" (at 100 250)
+      (pin 7 "VCCA" (net 3))
+      (pin 16 "VCCB" (net 4))
+      (pin 15 "OE" (net 3))
+      (pin 8 "GND" (net 1))
+      (pin 1 "A1/SCK" (net 5))
+      (pin 2 "A2/MOSI" (net 6))
+      (pin 3 "A3/MISO" (net 7))
+      (pin 4 "A4/CS" (net 8))
+      (pin 5 "A5/TRIG" (net 9))
+      (pin 6 "A6/SEL" (net 12))
+      (pin 14 "B1/SCK" (net 13))
+      (pin 13 "B2/MOSI" (net 6))
+      (pin 12 "B3/MISO" (net 7))
+      (pin 11 "B4/CS" (net 8))
+      (pin 10 "B5/TRIG" (net 9))
+      (pin 9 "B6/SEL" (net 12))
+    )
+  )
+
+  (sheet "TinyTapeout QFN-48" (at 0 300) (size 200 120)
+    (symbol "U2" "tt_um_grid_oracle" (at 100 340)
+      (pin 1 "VCCD1" (net 4))
+      (pin 2 "VSSD1" (net 1))
+      (pin 3 "VCCD2" (net 4))
+      (pin 4 "VSSD2" (net 1))
+      (pin 5 "ui_clk" (net 13))
+      (pin 6 "ui_rstb" (net 14))
+      (pin 7 "ui_in[0]" (net 6))
+      (pin 8 "ui_in[1]" (net 6))
+      (pin 9 "ui_in[2]" (net 6))
+      (pin 10 "ui_in[3]" (net 6))
+      (pin 11 "ui_in[4]" (net 6))
+      (pin 12 "ui_in[5]" (net 6))
+      (pin 13 "ui_in[6]" (net 6))
+      (pin 14 "ui_in[7]" (net 6))
+      (pin 15 "uo_out[0]" (net 7))
+      (pin 16 "uo_out[1]" (net 7))
+      (pin 17 "uo_out[2]" (net 7))
+      (pin 18 "uo_out[3]" (net 7))
+      (pin 19 "uo_out[4]" (net 7))
+      (pin 20 "uo_out[5]" (net 7))
+      (pin 21 "uo_out[6]" (net 7))
+      (pin 22 "uo_out[7]" (net 7))
+      (pin 23 "uio_in" (net 9))
+      (pin 24 "uio_oe" (net 3))
+      (pin 25 "uio_out" (net 10))
+      (pin 26 "sclk" (net 5))
+      (pin 27 "srstb" (net 3))
+      (pin 28 "sf_rd_en" (net 12))
+      (pin 29 "sf_wr_en" (net 8))
+      (pin 48 "EPAD" (net 1))
+    )
+  )
+
+  (sheet "User Interface" (at 0 420) (size 200 100)
+    (symbol "SW1" "TACTILE" (at 30 450) (pin 1 (net 17)) (pin 2 (net 1)))
+    (symbol "SW2" "TACTILE" (at 70 450) (pin 1 (net 18)) (pin 2 (net 1)))
+    (symbol "R3" "4.7k" (at 30 430) (pin 1 (net 17)) (pin 2 (net 3)))
+    (symbol "R4" "4.7k" (at 70 430) (pin 1 (net 18)) (pin 2 (net 3)))
+    (symbol "LED1" "LED_BLUE" (at 110 460) (pin 1 (net 19)) (pin 2 (net 1)))
+    (symbol "LED2" "LED_GREEN" (at 150 460) (pin 1 (net 20)) (pin 2 (net 1)))
+    (symbol "LED3" "LED_YELLOW" (at 190 460) (pin 1 (net 21)) (pin 2 (net 1)))
+    (symbol "LED4" "LED_RED" (at 30 480) (pin 1 (net 22)) (pin 2 (net 1)))
+    (symbol "R5" "220" (at 110 440) (pin 1 (net 3)) (pin 2 (net 19)))
+    (symbol "R6" "220" (at 150 440) (pin 1 (net 3)) (pin 2 (net 20)))
+    (symbol "R7" "220" (at 190 440) (pin 1 (net 3)) (pin 2 (net 21)))
+    (symbol "R8" "220" (at 30 460) (pin 1 (net 3)) (pin 2 (net 22)))
+    (symbol "OLED1" "SSD1306" (at 100 470)
+      (pin 1 "VCC" (net 3)) (pin 2 "GND" (net 1))
+      (pin 3 "SCL" (net 16)) (pin 4 "SDA" (net 15))
+    )
+    (symbol "R1" "4.7k" (at 80 450) (pin 1 (net 15)) (pin 2 (net 3)))
+    (symbol "R2" "4.7k" (at 120 450) (pin 1 (net 16)) (pin 2 (net 3)))
+  )
+)
+
+; =============================================================================
+; BILL OF MATERIALS
+; =============================================================================
+;
+; Ref    Part               Package    Value       Qty
+; -----  -----------------  ---------  ----------  ---
+; U1     RP2040             QFN-56     MCU         1
+; U2     tt_um_grid_oracle  QFN-48     Chip        1
+; U3     TXB0108            TSSOP-16   Lvl Shft    1
+; U4     AP2112K-3.3        SOT-23-5   LDO 3.3V    1
+; U5     AP2112K-1.8        SOT-23-5   LDO 1.8V    1
+; J1     USB-C              Type-C     Connector   1
+; J2     SWD Header         2x5 Pin    Connector   1
+; OLED1  SSD1306            0.96"      Display     1
+; SW1    Tactile            6x6mm      Button      1
+; SW2    Tactile            6x6mm      Button      1
+; Y1     Crystal            HC-49S     12 MHz      1
+; LED1   LED 0603           0603       Blue        1
+; LED2   LED 0603           0603       Green       1
+; LED3   LED 0603           0603       Yellow      1
+; LED4   LED 0603           0603       Red         1
+; C1,C2  Cap 0603           0603       100 nF      2
+; C3,C4  Cap 0805           0805       10 µF       2
+; C5     Cap 0603           0603       100 nF      1
+; C6,C7  Cap 0402           0402       12 pF       2
+; R1-R4  Res 0603           0603       4.7 kΩ      4
+; R5-R8  Res 0603           0603       220 Ω       4
+;
+; Power rails:
+;   USB-C (5V) -> AP2112K-3.3 -> 3.3V -> RP2040, TXB0108 VCCA, OLED, pull-ups
+;                              -> AP2112K-1.8 -> 1.8V -> TinyTapeout VCCD, TXB0108 VCCB
+;
+; GND: Common ground plane (solid pour on all layers)
+; =============================================================================
