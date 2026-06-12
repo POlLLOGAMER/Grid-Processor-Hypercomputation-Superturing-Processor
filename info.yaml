@@ -9,10 +9,16 @@ project:
   tiles:        "1x1"
   top_module:   "tt_um_grid_oracle"
   source_files:
-    - "tt_um_grid_oracle.sv"
-    # Agrega aquí abajo los demás archivos .sv o .v que use tu diseño si no están metidos todos en el mismo archivo, por ejemplo:
-    # - "clock_divider.sv"
-    # - "grid_processor_core.sv"
+    - tt_um_grid_oracle.sv
+    - reset_synchronizer.sv
+    - clock_divider.sv
+    - grid_processor_core.sv
+    - grid_cell.sv
+    - bridge_quantizer.sv
+    - adc_interface.sv
+    - output_mux.sv
+    - grid_cell_array.v
+  top_module: "tt_um_grid_oracle"
 
 pinout:
   ui[0]: "Grid seed bit 0 / Data bus D0"
