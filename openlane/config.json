@@ -18,7 +18,7 @@
   "yosys_synth_options": "-flatten",
   "die_area": "0 0 160 200",
   "core_area": "5 5 155 195",
-  "fp_core_utilization": 40,
+  "fp_core_utilization": 25,
   "fp_core_aspect_ratio": 0.8,
   "route_max_layer": "met5",
   "route_min_layer": "met1",
