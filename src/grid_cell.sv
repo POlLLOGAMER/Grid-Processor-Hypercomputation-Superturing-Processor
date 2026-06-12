@@ -56,30 +56,32 @@ module grid_cell (
     assign is_stable = (current_state == prev_state) ? 1'b1 : 1'b0;
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            current_state  <= 4'b0000;
-            prev_state     <= 4'b0000;
-            next_state     <= 4'b0000;
+    if (!rst_n) begin
+        current_state  <= 4'b0000;
+        prev_state     <= 4'b0000;
+        stable_counter <= 2'b00;
+        state_out      <= 4'b0000;
+    end
+    else if (enable) begin
+        prev_state    <= current_state;
+        current_state <= next_state;
+        state_out     <= current_state;
+
+        if (is_stable) begin
+            if (stable_counter < 2'd3)
+                stable_counter <= stable_counter + 1'b1;
+        end
+        else begin
             stable_counter <= 2'b00;
-            state_out      <= 4'b0000;
-        end else if (enable) begin
-            prev_state    <= current_state;
-            current_state <= next_state;
-            state_out     <= current_state;
-            if (is_stable) begin
-                if (stable_counter < 2'd3)
-                    stable_counter <= stable_counter + 1'b1;
-            end else begin
-                stable_counter <= 2'b00;
-            end
         end
     end
+end
 
-    always @(*) begin
-        if (!enable)
-            next_state = seed_in;
-        else
-            next_state = totalistic_rule(neighbor_sum[3:0], current_state);
-    end
+always @(*) begin
+    if (!enable)
+        next_state = seed_in;
+    else
+        next_state = totalistic_rule(neighbor_sum[3:0], current_state);
+end
 
 endmodule
